@@ -21,6 +21,13 @@ func main() {
 	r.Run()
 }
 
+type Target string
+
+type TargetResult struct {
+	Targets []Target `json:"targets"`
+	Labels  map[string]string
+}
+
 func buildkiteServiceDiscoveryHandler(buildkiteToken string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		log.Println("start of root request")
