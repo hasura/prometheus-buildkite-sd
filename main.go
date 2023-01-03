@@ -29,6 +29,9 @@ type TargetResult struct {
 }
 
 func buildkiteServiceDiscoveryHandler(buildkiteToken string) func(c *gin.Context) {
+	// TODO: while testing this out,
+	// a single host machine could host multiple agents
+	// so test that case also
 	return func(c *gin.Context) {
 		log.Println("start of root request")
 		c.JSON(http.StatusOK, gin.H{
