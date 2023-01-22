@@ -2,8 +2,10 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/buildkite/go-buildkite/v3/buildkite"
 	"github.com/gin-gonic/gin"
@@ -16,9 +18,10 @@ var IPAddress TargetMode = "ip-address"
 var HostName TargetMode = "host-name"
 
 type AppConfig struct {
-	BuildkiteToken string     `envconfig:"BUILDKITE_TOKEN" required:"true"`
-	BuildkiteOrg   string     `envconfig:"BUILDKITE_ORG" required:"true"`
-	TargetMode     TargetMode `envconfig:"TARGET_MODE" default:"ip-address"`
+	BuildkiteToken string     `split_words:"true" required:"true"`
+	BuildkiteOrg   string     `split_words:"true" required:"true"`
+	TargetMode     TargetMode `split_words:"true" default:"ip-address"`
+	TargetPorts    string     `split_words:"true" required:"true"`
 }
 
 func main() {
@@ -96,6 +99,12 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 				}
 			} else {
 				c.Error(errors.New("unknown TARGET_MODE, please set that env to ip-address or host-name"))
+			}
+
+			for _, port := range strings.Split(appConfig.TargetPorts, ",") {
+				for idx := range entry.Targets {
+					entry.Targets[idx] = fmt.Sprintf("%s:%s", entry.Targets[idx], port)
+				}
 			}
 
 			// TODO: agent.Metadata is an array of string. It could contain two queues with different vaules
