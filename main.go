@@ -107,6 +107,18 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 				}
 			}
 
+			if agent.Job != nil {
+				// A job is actively running on the agent
+				// So add metadata related to it
+				if agent.Job.ID != nil {
+					entry.Labels["__meta__buildkite_job_id"] = *agent.Job.ID
+				}
+
+				if agent.Job.StepKey != nil {
+					entry.Labels["__meta__buildkite_job_key"] = *agent.Job.StepKey
+				}
+			}
+
 			// TODO: agent.Metadata is an array of string. It could contain two queues with different vaules
 			// at that point, the agent is supposed to be serving both of the queues at the same time
 			// so have separate SD entries for them
