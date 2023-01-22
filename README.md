@@ -6,7 +6,7 @@ Prometheus service discovery for buildkite agents, builds, and jobs.
 
 ## Configuration
 
-#### BUILDKITE_TOKEN
+#### `BUILDKITE_TOKEN`
 
 (Environment Variable. Required.)
 
@@ -15,13 +15,13 @@ Buildkite API token used to fetch data from Buildkite. It could be generated fro
 The API token will need the following REST API scopes:
 - Read Agents (`read_agents`)
 
-#### BUILDKITE_ORG
+#### `BUILDKITE_ORG`
 
 (Environment Variable. Required.)
 
 Buildkite organisation slug. Example: `https://buildkite.com/ORG_SLUG` is where you can visit the buildkite dashboard of your organisation.
 
-#### TARGET_MODE
+#### `TARGET_MODE`
 
 (Environment Variable. Optional)
 
@@ -32,7 +32,7 @@ Available options for `TARGET_MODE` are
 - `host-name`
 
 
-#### TARGET_PORTS
+#### `TARGET_PORTS`
 
 (Environment Variable. Required.)
 
