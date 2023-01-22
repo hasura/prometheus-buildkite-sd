@@ -125,6 +125,8 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 			sdEntries = append(sdEntries, entry)
 		}
 
+		// TODO: handle c.Error
+
 		c.JSON(http.StatusOK, sdEntries)
 
 		log.Println("end of root request")
