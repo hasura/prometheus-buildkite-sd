@@ -3,22 +3,25 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/buildkite/go-buildkite/v3/buildkite"
 	"github.com/gin-gonic/gin"
+	"github.com/kelseyhightower/envconfig"
 )
+
+type AppConfig struct {
+	BuildkiteToken string `envconfig:"BUILDKITE_TOKEN" required:"true"`
+	BuildkiteOrg   string `envconfig:"BUILDKITE_ORG" required:"true"`
+}
 
 func main() {
 	log.Println("Starting prometheus-buildkite-sd")
 
-	buildkiteToken := os.Getenv("BUILDKITE_TOKEN")
-	if len(buildkiteToken) == 0 {
-		log.Fatalln("BUILDKITE_TOKEN environment variable is empty. Please set it to a non-empty value.")
-	}
+	var appConfig AppConfig
+	envconfig.MustProcess("", &appConfig)
 
 	r := gin.Default()
-	r.GET("/", buildkiteServiceDiscoveryHandler(buildkiteToken))
+	r.GET("/", buildkiteServiceDiscoveryHandler(appConfig))
 	r.Run()
 }
 
@@ -29,14 +32,14 @@ type TargetResult struct {
 	Labels  map[string]string
 }
 
-func buildkiteServiceDiscoveryHandler(buildkiteToken string) func(c *gin.Context) {
+func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) {
 	// TODO: while testing this out,
 	// a single host machine could host multiple agents
 	// so test that case also
 	return func(c *gin.Context) {
 		log.Println("start of root request")
 
-		config, err := buildkite.NewTokenConfig(buildkiteToken, false)
+		config, err := buildkite.NewTokenConfig(appConfig.BuildkiteToken, false)
 		if err != nil {
 			c.Error(err)
 		}
@@ -44,8 +47,7 @@ func buildkiteServiceDiscoveryHandler(buildkiteToken string) func(c *gin.Context
 		var allAgents []buildkite.Agent
 
 		for currentPage, lastPage := 1, 0; (currentPage == 1) || (currentPage <= lastPage); {
-			// TODO: avoid hardcoding the org
-			agents, resp, err := buildkiteClient.Agents.List("hasura", &buildkite.AgentListOptions{
+			agents, resp, err := buildkiteClient.Agents.List(appConfig.BuildkiteOrg, &buildkite.AgentListOptions{
 				ListOptions: buildkite.ListOptions{
 					Page:    currentPage,
 					PerPage: 4,
