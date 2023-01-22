@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -9,9 +10,15 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+type TargetMode string
+
+var IPAddress TargetMode = "ip-address"
+var HostName TargetMode = "host-name"
+
 type AppConfig struct {
-	BuildkiteToken string `envconfig:"BUILDKITE_TOKEN" required:"true"`
-	BuildkiteOrg   string `envconfig:"BUILDKITE_ORG" required:"true"`
+	BuildkiteToken string     `envconfig:"BUILDKITE_TOKEN" required:"true"`
+	BuildkiteOrg   string     `envconfig:"BUILDKITE_ORG" required:"true"`
+	TargetMode     TargetMode `envconfig:"TARGET_MODE" default:"ip-address"`
 }
 
 func main() {
@@ -19,6 +26,10 @@ func main() {
 
 	var appConfig AppConfig
 	envconfig.MustProcess("", &appConfig)
+
+	// log useful information on server start
+	log.Println("config -> org", appConfig.BuildkiteOrg)
+	log.Println("config -> target-mode", appConfig.TargetMode)
 
 	r := gin.Default()
 	r.GET("/", buildkiteServiceDiscoveryHandler(appConfig))
@@ -69,13 +80,22 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 
 		for _, agent := range allAgents {
 			entry := PromSDEntry{
-				Targets: []string{
-					*agent.IPAddress,
-				},
 				Labels: map[string]string{
 					"__meta__host_name":       *agent.Hostname,
 					"__meta__connected_state": *agent.ConnectedState, // TODO: see if you could filter by connected state in buildkite api itself
 				},
+			}
+
+			if appConfig.TargetMode == IPAddress {
+				entry.Targets = []string{
+					*agent.IPAddress,
+				}
+			} else if appConfig.TargetMode == HostName {
+				entry.Targets = []string{
+					*agent.Hostname,
+				}
+			} else {
+				c.Error(errors.New("unknown TARGET_MODE, please set that env to ip-address or host-name"))
 			}
 
 			// TODO: agent.Metadata is an array of string. It could contain two queues with different vaules
