@@ -8,19 +8,35 @@ Prometheus service discovery for buildkite agents, builds, and jobs.
 
 #### BUILDKITE_TOKEN
 
-TODO
+(Environment Variable. Required.)
+
+Buildkite API token used to fetch data from Buildkite. It could be generated from this [buildkite page](https://buildkite.com/user/api-access-tokens).
+
+The API token will need the following REST API scopes:
+- Read Agents (`read_agents`)
 
 #### BUILDKITE_ORG
 
-TODO
+(Environment Variable. Required.)
+
+Buildkite organisation slug. Example: `https://buildkite.com/ORG_SLUG` is where you can visit the buildkite dashboard of your organisation.
 
 #### TARGET_MODE
 
-TODO
+(Environment Variable. Optional)
+
+Target mode denotes the way in which Prometheus target ip addresses could be constructured.
+
+Available options for `TARGET_MODE` are
+- `ip-address`
+- `host-name`
+
 
 #### TARGET_PORTS
 
-TODO
+(Environment Variable. Required.)
+
+Target ports is a comma-separated value of ports that will be used to construct `<target_ip_address>:<target_port>` combination of the prometheus targets.
 
 ## Develop
 
