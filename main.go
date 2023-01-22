@@ -50,7 +50,7 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 			agents, resp, err := buildkiteClient.Agents.List(appConfig.BuildkiteOrg, &buildkite.AgentListOptions{
 				ListOptions: buildkite.ListOptions{
 					Page:    currentPage,
-					PerPage: 4,
+					PerPage: 100,
 				},
 			})
 			if err != nil {
