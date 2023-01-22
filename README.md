@@ -6,6 +6,22 @@ Prometheus service discovery for buildkite agents, builds, and jobs.
 
 ## Configuration
 
+#### BUILDKITE_TOKEN
+
+TODO
+
+#### BUILDKITE_ORG
+
+TODO
+
+#### TARGET_MODE
+
+TODO
+
+#### TARGET_PORTS
+
+TODO
+
 ## Develop
 
 ```bash
