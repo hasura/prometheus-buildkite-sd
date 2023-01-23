@@ -84,8 +84,8 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 		for _, agent := range allAgents {
 			entry := PromSDEntry{
 				Labels: map[string]string{
-					"__meta__host_name":       *agent.Hostname,
-					"__meta__connected_state": *agent.ConnectedState, // TODO: see if you could filter by connected state in buildkite api itself
+					"buildkite_agent_host_name": *agent.Hostname,
+					// TODO: see if you could filter by connected state in buildkite api itself
 				},
 			}
 
@@ -111,11 +111,11 @@ func buildkiteServiceDiscoveryHandler(appConfig AppConfig) func(c *gin.Context) 
 				// A job is actively running on the agent
 				// So add metadata related to it
 				if agent.Job.ID != nil {
-					entry.Labels["__meta__buildkite_job_id"] = *agent.Job.ID
+					entry.Labels["buildkite_job_id"] = *agent.Job.ID
 				}
 
 				if agent.Job.StepKey != nil {
-					entry.Labels["__meta__buildkite_job_key"] = *agent.Job.StepKey
+					entry.Labels["buildkite_job_key"] = *agent.Job.StepKey
 				}
 			}
 
